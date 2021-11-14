@@ -42,6 +42,7 @@ async def main():
 
 timestamp = datetime.datetime.now()
 timestamp_str = str(timestamp)
+print(timestamp_str)
 f = open("known_instances.txt", "r")
 sites = f.read().splitlines()
 f.close()
