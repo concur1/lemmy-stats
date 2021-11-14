@@ -80,7 +80,7 @@ def check_processed_json_for_new_instances(processed_json_data):
         if allowed is not None:
             all_instances.update(allowed)
     unknown_instances = [f"https://{instance}" for instance in all_instances if f"https://{instance}" not in metadata_instances]
-    print(f"Instances not in known_instances.txt: {unknown_instances}")
+    print(f"Instances not in known_instances.txt: \n{unknown_instances}\n\n")
 
 
 historical_filepath = "data/historical.csv"
