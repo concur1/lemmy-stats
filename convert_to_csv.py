@@ -45,11 +45,12 @@ def write_historical_csv(processed_json_data):
         fieldnames = row.keys()
         if not os.path.isfile(historical_filepath):
             with open(f"data/historical.csv", "w") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='|')
+                writer.writeheader()
                 writer.writerow(row)
         else:
             with open(f"data/historical.csv", "a") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='|')
                 writer.writerow(row)
 
 
