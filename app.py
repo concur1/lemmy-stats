@@ -7,8 +7,9 @@ from dash import html
 import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
-
-app = dash.Dash(__name__)
+import flask
+server = flask.Flask(__name__)
+app = dash.Dash(__name__, server=server)
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
@@ -21,7 +22,7 @@ template = "seaborn"
 
 
 app.layout = html.Div(children=[
-    html.H1(children='Lemmy Stats', style={"colour": "#111111"}),
+    html.H1(children='Lemmy Stats'),
     dcc.Dropdown(
         id='yaxis_column',
         options=[{'label': i, 'value': i} for i in metrics],
@@ -39,7 +40,7 @@ app.layout = html.Div(children=[
         value='online')], style={'width': '48%', 'display': 'inline-block'}),
     dcc.Graph(id='each-instance'),
 
-], style={"background-colour": "#111111"})
+])
 @app.callback(
     Output('combined-instances', 'figure'),
     Input('yaxis_column', 'value'),
@@ -62,5 +63,6 @@ def update_each_instance(xaxis_column_name, metric):
     return fig
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+@server.route('/hello')
+def hello():
+    return 'Hello, World!'
