@@ -14,7 +14,7 @@ app = dash.Dash(__name__, server=server)
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
 
-df = pd.read_csv("data/historical.csv", delimiter='|')
+df = pd.read_csv("../data/historical.csv", delimiter='|')
 unique_urls = df['url'].unique()
 metrics = ["online", "users", "posts", "comments", "communities", "users_active_day", "users_active_week", "users_active_month",
           "users_active_half_year"]
@@ -46,7 +46,7 @@ app.layout = html.Div(children=[
     Input('yaxis_column', 'value'),
 )
 def update_combined_instances(yaxis_column):
-    df = pd.read_csv("data/historical.csv", delimiter='|')
+    df = pd.read_csv("../data/historical.csv", delimiter='|')
     df = df.sort_values(yaxis_column, ascending=False).query("timestamp == timestamp.max()")
     fig = px.bar(df, x="url", y=yaxis_column, color="url", template=template)
     return fig
@@ -57,7 +57,7 @@ def update_combined_instances(yaxis_column):
     Input('metric', 'value'),
 )
 def update_each_instance(xaxis_column_name, metric):
-    df = pd.read_csv("data/historical.csv", delimiter='|').query(f"url == '{xaxis_column_name}'")
+    df = pd.read_csv("../data/historical.csv", delimiter='|').query(f"url == '{xaxis_column_name}'")
     df = df[['timestamp', metric]].sort_values('timestamp', ascending=False)
     fig = px.line(df, x="timestamp", y=metric, template=template)
     return fig
