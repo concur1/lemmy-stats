@@ -8,8 +8,8 @@ import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
 import flask
-server = flask.Flask(__name__)
-app = dash.Dash(__name__, server=server)
+app = dash.Dash(__name__)
+server = app.server
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
@@ -63,6 +63,5 @@ def update_each_instance(xaxis_column_name, metric):
     return fig
 
 
-@server.route('/hello')
-def hello():
-    return 'Hello, World!'
+if __name__ == '__main__':
+    app.run_server(debug=True)
