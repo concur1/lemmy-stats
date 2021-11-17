@@ -1,0 +1,46 @@
+
+:root {
+  --main-bg-color: #282d3f;
+  --main_text_color: white;
+  --second-bg-color: #111111;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: var(--main-bg-color);
+    color: var(--main_text_color);
+}
+
+h1 {color:white;}
+
+.Select-value-label {
+  background-color: var(--second-bg-color);
+  color: var(--main_text_color);
+}
+.Select-multi-value-wrapper{
+  background-color: var(--second-bg-color);
+  color: var(--main_text_color);
+}
+
+.VirtualizedSelectOption {
+  background-color: var(--second-bg-color);
+  color: var(--main_text_color);
+}
+
+.VirtualizedSelectFocusedOption {
+  background-color: var(--second-bg-color);
+  color: var(--main_text_color);
+ }
+
+
+#react-select-2--value-item {
+  color: var(--main_text_color);
+  }
+
+  #react-select-3--value-item {
+    color: var(--main_text_color);
+  }
+
+  #react-select-4--value-item {
+     color: var(--main_text_color);
+  }

@@ -18,8 +18,8 @@ df = pd.read_csv("data/historical.csv", delimiter='|')
 unique_urls = df['url'].unique()
 metrics = ["online", "users", "posts", "comments", "communities", "users_active_day", "users_active_week", "users_active_month",
           "users_active_half_year"]
-template = "seaborn"
-
+template = "plotly_dark"
+css = {'width': '48%', 'display': 'inline-block', "backgroundColor": "black"}
 
 app.layout = html.Div(children=[
     html.H1(children='Lemmy Stats'),
@@ -32,15 +32,17 @@ app.layout = html.Div(children=[
     dcc.Dropdown(
         id='xaxis-column',
         options=[{'label': i, 'value': i} for i in unique_urls],
-        value='https://lemmy.ml')], style={'width': '48%', 'display': 'inline-block'}),
+        value='https://lemmy.ml')], style=css),
     html.Div([
     dcc.Dropdown(
         id='metric',
         options=[{'label': i, 'value': i} for i in metrics],
-        value='online')], style={'width': '48%', 'display': 'inline-block'}),
+        value='online')], style=css),
     dcc.Graph(id='each-instance'),
 
 ])
+
+
 @app.callback(
     Output('combined-instances', 'figure'),
     Input('yaxis_column', 'value'),
