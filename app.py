@@ -8,7 +8,8 @@ import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
 import flask
-app = dash.Dash(__name__)
+app = dash.Dash(__name__,
+                meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
 server = app.server
 
 # assume you have a "long-form" data frame
@@ -26,7 +27,7 @@ app.layout = html.Div(children=[
     dcc.Dropdown(
         id='yaxis_column',
         options=[{'label': i, 'value': i} for i in metrics],
-        value='online'),
+        value='users_active_half_year'),
     dcc.Graph(id='combined-instances'),
     html.Div([
     dcc.Dropdown(
