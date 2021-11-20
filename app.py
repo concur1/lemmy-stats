@@ -7,7 +7,6 @@ from dash import html
 import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
-import flask
 app = dash.Dash(__name__,
                 meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}])
 server = app.server
@@ -20,7 +19,9 @@ unique_urls = df['url'].unique()
 metrics = ["online", "users", "posts", "comments", "communities", "users_active_day", "users_active_week", "users_active_month",
           "users_active_half_year"]
 template = "plotly_dark"
-css = {'width': '48%', 'display': 'inline-block', "backgroundColor": "black"}
+css = {'width': '48%', 'display': 'inline-block'}
+font = dict(family="Helvetica",
+            size=12)
 
 app.layout = html.Div(children=[
     html.H1(children='Lemmy Stats'),
@@ -52,6 +53,7 @@ def update_combined_instances(yaxis_column):
     df = pd.read_csv("data/historical.csv", delimiter='|')
     df = df.sort_values(yaxis_column, ascending=False).query("timestamp == timestamp.max()")
     fig = px.bar(df, x="url", y=yaxis_column, color="url", template=template)
+    fig = fig.update_layout(font=font, showlegend=False)
     return fig
 
 @app.callback(
@@ -63,6 +65,7 @@ def update_each_instance(xaxis_column_name, metric):
     df = pd.read_csv("data/historical.csv", delimiter='|').query(f"url == '{xaxis_column_name}'")
     df = df[['timestamp', metric]].sort_values('timestamp', ascending=False)
     fig = px.line(df, x="timestamp", y=metric, template=template)
+    fig = fig.update_layout(font=font)
     return fig
 
 
