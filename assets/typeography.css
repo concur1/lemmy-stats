@@ -6,7 +6,6 @@
 }
 
 body {
-    font-family: sans-serif;
     background-color: var(--main-bg-color);
     color: var(--main_text_color);
 }
@@ -44,3 +43,15 @@ h1 {color:white;}
   #react-select-4--value-item {
      color: var(--main_text_color);
   }
+
+div.Select.has-value.Select–single > .Select-control .Select-value .Select-value-label,
+div.Select.has-value.is-pseudo-focused.Select–single>.Select-control .Select-value .Select-value-label {
+  background-color: var(--second-bg-color);
+  color: var(--main_text_color);
+}
+
+div.Select–single>.Select-control .Select-value,
+div.Select-placeholder {
+  background-color: var(--second-bg-color);
+  color: var(--main_text_color);
+ }
