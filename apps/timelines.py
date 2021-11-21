@@ -17,7 +17,7 @@ df = pd.read_csv("data/historical.csv", delimiter='|')
 unique_urls = df['url'].unique()
 metrics = ["online", "users", "posts", "comments", "communities", "users_active_day", "users_active_week", "users_active_month",
           "users_active_half_year"]
-title = {'y': 0.95,
+title = {'y': 0.9,
         'x': 0.5,
     'text': "Timeline",
     'xanchor': 'center',
