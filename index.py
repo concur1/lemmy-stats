@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 from app import app
 from apps import latest_values, timelines
 
-
+server=app.server
 app.layout = html.Div([
     dcc.Location(id='url', refresh=True),
     html.Div(id='page-content')
