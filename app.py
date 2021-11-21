@@ -10,15 +10,10 @@ app = dash.Dash(__name__,
 server = app.server
 
 dropdown = dbc.NavbarSimple(
-    children=[
-        dbc.DropdownMenu(
-            label="Menu",
-            menu_variant="dark",
             children=[
-                dbc.DropdownMenuItem("Latest Values", href="/latest_values"),
-                dbc.DropdownMenuItem("Timelines", href="/timelines")
-            ])],
-    brand="Lemmy-Stats",
-    brand_href="#",
-    color="darkblue",
-    dark=True)
+                dbc.NavItem(dbc.NavLink("Latest Values", href="/latest_values")),
+                dbc.NavItem(dbc.NavLink("Timeline", href="/timeline"))],
+            brand="Lemmy-Stats",
+            brand_href="#",
+            color="darkblue",
+            dark=True)

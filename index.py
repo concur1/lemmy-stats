@@ -2,7 +2,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import latest_values, timelines
+from apps import latest_values, timeline
 
 server=app.server
 app.layout = html.Div([
@@ -16,8 +16,8 @@ app.layout = html.Div([
 def display_page(pathname):
     if pathname == '/latest_values':
         return latest_values.layout
-    elif pathname == '/timelines':
-        return timelines.layout
+    elif pathname == '/timeline':
+        return timeline.layout
     elif pathname in ["", "/"]:
         return latest_values.layout
     else:
