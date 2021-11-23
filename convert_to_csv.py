@@ -1,7 +1,9 @@
 import os
 import json
 import csv
+import sqlite3
 from zipfile import ZipFile
+import datetime
 
 
 def load_from_json_dir(raw_json_dir):
@@ -44,13 +46,15 @@ def process_json_data(all_json_data):
 def write_historical_csv(processed_json_data):
     for row in processed_json_data:
         fieldnames = row.keys()
-        if not os.path.isfile(historical_filepath):
-            with open(f"data/historical.csv", "w") as csvfile:
+        instance = row['url'].replace('https://', '')
+        write_path = f"data/historical_csvs/{instance}.csv"
+        if not os.path.isfile(write_path):
+            with open(write_path, "w") as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='|')
                 writer.writeheader()
                 writer.writerow(row)
         else:
-            with open(f"data/historical.csv", "a") as csvfile:
+            with open(write_path, "a") as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='|')
                 writer.writerow(row)
 
@@ -69,10 +73,7 @@ def zip_json_files(raw_json_dir):
             os.remove(json_file_path)
 
 
-def check_processed_json_for_new_instances(processed_json_data):
-    f = open("known_instances.txt", "r")
-    metadata_instances = set(f.read().splitlines())
-    f.close()
+def find_all_instances(processed_json_data):
     all_instances = set()
     for row in processed_json_data:
         linked = row["linked_federated_instances"]
@@ -81,16 +82,59 @@ def check_processed_json_for_new_instances(processed_json_data):
         allowed = row["allowed_federated_instances"]
         if allowed is not None:
             all_instances.update(allowed)
-    unknown_instances = [f"https://{instance}" for instance in all_instances if f"https://{instance}" not in metadata_instances]
-    print(f"Instances not in known_instances.txt: \n{unknown_instances}\n\n")
+    return list(all_instances)
 
 
-historical_filepath = "data/historical.csv"
+def find_metadata_instances():
+    f = open("known_instances.txt", "r")
+    metadata_instances = set(f.read().splitlines())
+    f.close()
+    return list(metadata_instances)
+
+
+def save_instance_categories():
+    all_instances = find_all_instances(processed_json_data)
+    metadata_instances = find_metadata_instances()
+    instance_dict = {"all_instances": all_instances,
+    "metadata_instances": metadata_instances,
+    "unknown_instances": find_unknown_instances(metadata_instances, all_instances)}
+    with open(f'data/instance_categories/{str(timestamp)}.json', 'w') as f:
+        json.dump(instance_dict, f)
+
+
+def find_unknown_instances(metadata_instances, all_instances):
+    return [f"https://{instance}" for instance in all_instances if f"https://{instance}" not in metadata_instances]
+
+
+def create_or_append_sqllite_tables(processed_json_data):
+    con = sqlite3.connect('data/lemmy.db')
+    cur = con.cursor()
+    schema = "timestamp text, url text, status text, name text, online integer, version text, description text, " \
+             "users integer, posts integer, comments integer, communities integer, users_active_day integer, users_active_week " \
+             "integer, users_active_month integer, users_active_half_year integer, updated text, " \
+             "linked_federated_instances text, allowed_federated_instances text"
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS historical ({schema})''')
+    for row in processed_json_data:
+        values_to_insert = []
+        for item in row.values():
+            if not isinstance(item, int):
+                item = str(item).replace("""'""", """''""")
+                values_to_insert.append(f"'{item}'")
+            else:
+                values_to_insert.append(str(item))
+
+        values_to_insert_string = ", ".join(values_to_insert)
+        insert_string = f"INSERT INTO historical VALUES ({values_to_insert_string})"
+        cur.execute(insert_string)
+        con.commit()
+    con.close()
+
+timestamp = datetime.datetime.now()
 raw_json_dir = "data/raw_json"
 
 all_json_data = load_from_json_dir(raw_json_dir)
 processed_json_data = process_json_data(all_json_data)
-check_processed_json_for_new_instances(processed_json_data)
-write_historical_csv(processed_json_data)
+create_or_append_sqllite_tables(processed_json_data)
+save_instance_categories()
 zip_json_files(raw_json_dir)
-
+print(f"convert and load to historical table: {datetime.datetime.now() - timestamp}")

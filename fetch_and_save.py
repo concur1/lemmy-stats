@@ -9,16 +9,16 @@ async def fetch(url, session):
         async with session.get(f"{url}/api/v3/site") as response:
             api_json_text = await response.text()
     except Exception as e:
-        print(f"{url}/api/v3/site" + " "*(60-len(url)) + "(Failed)")
+        # print(f"{url}/api/v3/site" + " "*(60-len(url)) + "(Failed)")
         return {"timestamp": str(timestamp), "status": "No Response", "url": url, "Exception": str(e), "json": None}
     if api_json_text is None:
-        print(f"{url}/api/v3/site" + " " * (60 - len(url)) + "(Failed)")
+        # print(f"{url}/api/v3/site" + " " * (60 - len(url)) + "(Failed)")
         return {"timestamp": str(timestamp), "status": "No API", "url": url, "Exception": None,  "json": None}
     else:
         try:
             api_json = json.loads(api_json_text)
         except:
-            print(f"{url}/api/v3/site" + " " * (60 - len(url)) + "(Failed)")
+            # print(f"{url}/api/v3/site" + " " * (60 - len(url)) + "(Failed)")
             return {"timestamp": str(timestamp), "status": "Could not parse API", "url": url, "Exception": None, "json": None}
 
     json_filtered = {}
@@ -27,7 +27,7 @@ async def fetch(url, session):
     json_filtered['version'] = api_json['version']
     json_filtered['federated_instances'] = api_json['federated_instances']
 
-    print(f"{url}/api/v3/site" + " " * (60 - len(url)) + "(Success)")
+    # print(f"{url}/api/v3/site" + " " * (60 - len(url)) + "(Success)")
     return {"timestamp": str(timestamp), "status": "Success", "url": url, "Exception": None, "json": json_filtered}
 
 
@@ -54,4 +54,4 @@ for page in html_pages:
 with open(f'data/raw_json/{timestamp_str} - lemmy instances stats.json', 'w') as f:
     json.dump(rows, f)
 
-print(f"runtime: {datetime.datetime.now() - timestamp}")
+print(f"fetch and save runtime: {datetime.datetime.now() - timestamp}")
