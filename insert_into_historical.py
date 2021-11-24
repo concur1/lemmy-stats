@@ -40,6 +40,27 @@ def process_json_data(all_json_data):
                      "allowed_federated_instances": instance["json"]["federated_instances"]["allowed"]
                        }
                 processed_json_data.append(row)
+            else:
+                row = {"timestamp": instance["timestamp"],
+                       "url": instance["url"],
+                       "status": instance["status"],
+                       "name": None,
+                       "online": None,
+                       "version": None,
+                       "description": None,
+                       "users": None,
+                       "posts": None,
+                       "comments": None,
+                       "communities": None,
+                       "users_active_day": None,
+                       "users_active_week": None,
+                       "users_active_month": None,
+                       "users_active_half_year": None,
+                       "updated": None,
+                       "linked_federated_instances": None,
+                       "allowed_federated_instances": None
+                       }
+                processed_json_data.append(row)
     return processed_json_data
 
 

@@ -38,7 +38,8 @@ def update_combined_instances(yaxis_column):
     cnx = sqlite3.connect('data/lemmy.db')
     df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)} 
     FROM historical
-    order by users_active_half_year""", cnx)
+    WHERE status == 'Success'
+    ORDER BY users_active_half_year""", cnx)
     df = df.query("timestamp == timestamp.max()")
     fig = px.bar(df, x="url", y=yaxis_column, color="url", template=template)
     fig = fig.update_layout(font=font, showlegend=False, title=title)

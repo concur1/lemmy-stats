@@ -58,7 +58,7 @@ def update_each_instance(xaxis_column_name, metric):
                                 posts-lag(posts) OVER win1 as new_posts,
                                 communities-lag(communities) OVER win1 as new_communities
                         FROM historical
-                        where url == '{xaxis_column_name}'
+                        where url == '{xaxis_column_name}' and status == 'Success'
                         WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp))
                         order by timestamp""", cnx)
     df = df[['timestamp', metric]].sort_values('timestamp', ascending=False)

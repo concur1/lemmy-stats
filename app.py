@@ -14,6 +14,6 @@ dropdown = dbc.NavbarSimple(
                 dbc.NavItem(dbc.NavLink("Latest Values", href="/latest_values")),
                 dbc.NavItem(dbc.NavLink("Timeline", href="/timeline"))],
             brand="Lemmy-Stats",
-            brand_href="#",
+            brand_href="/",
             color="darkblue",
             dark=True)

@@ -1,14 +1,22 @@
 from dash import dcc, html
 from dash.dependencies import Input, Output
 
-from app import app
+from app import app, dropdown
 from apps import latest_values, timeline
 
 server=app.server
-app.layout = html.Div([
+app.layout = html.Div(children=[
     dcc.Location(id='url', refresh=True),
-    html.Div(id='page-content')
+    html.Div(id='page-content'),
 ])
+
+homepage = html.Div([dropdown,
+    html.Br(),
+    dcc.Markdown('''
+    - [Click here to see how lemmy activity has changed over time](/timeline)
+    
+    - [Click here to see the latest activity for each instance](/latest_values)
+    ''')])
 
 
 @app.callback(Output('page-content', 'children'),
@@ -19,7 +27,7 @@ def display_page(pathname):
     elif pathname == '/timeline':
         return timeline.layout
     elif pathname in ["", "/"]:
-        return latest_values.layout
+        return homepage
     else:
         return '404'
 
