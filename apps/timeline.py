@@ -48,10 +48,10 @@ layout = html.Div(children=[
 )
 def update_each_instance(xaxis_column_name, metric):
     cnx = sqlite3.connect('data/lemmy.db')
-    df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)} 
-                            FROM historical
-                            where url == '{xaxis_column_name}'
-                            order by timestamp""", cnx)
+    df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)},
+                         FROM historical
+                         where url == '{xaxis_column_name}'
+                         order by timestamp""", cnx)
     df = df[['timestamp', metric]].sort_values('timestamp', ascending=False)
     fig = px.line(df, x="timestamp", y=metric, template=template)
     fig = fig.update_layout(font=font, title=title)
