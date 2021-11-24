@@ -13,8 +13,8 @@ server = app.server
 
 selected_urls = sqlite3.connect('data/lemmy.db').execute("""SELECT distinct url from historical""")
 unique_urls = [instance[0] for instance in selected_urls]
-metrics = ["online", "users_active_day", "users_active_week", "users_active_month",
-          "users_active_half_year"]
+metrics = ["online", "new_comments", "new_posts", "new_communities", "users_active_day",
+           "users_active_month", "users_active_half_year"]
 title = {'y': 0.9,
         'x': 0.5,
     'text': "Timeline",
@@ -48,10 +48,19 @@ layout = html.Div(children=[
 )
 def update_each_instance(xaxis_column_name, metric):
     cnx = sqlite3.connect('data/lemmy.db')
-    df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)},
-                         FROM historical
-                         where url == '{xaxis_column_name}'
-                         order by timestamp""", cnx)
+    df = pd.read_sql(f"""SELECT timestamp, 
+                                url, 
+                                online, 
+                                users_active_day,
+                                users_active_month,
+                                users_active_half_year,
+                                comments-lag(comments) OVER win1 as new_comments,
+                                posts-lag(posts) OVER win1 as new_posts,
+                                communities-lag(communities) OVER win1 as new_communities
+                        FROM historical
+                        where url == '{xaxis_column_name}'
+                        WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp))
+                        order by timestamp""", cnx)
     df = df[['timestamp', metric]].sort_values('timestamp', ascending=False)
     fig = px.line(df, x="timestamp", y=metric, template=template)
     fig = fig.update_layout(font=font, title=title)
