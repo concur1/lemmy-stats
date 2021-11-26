@@ -11,6 +11,7 @@ server = app.server
 
 dropdown = dbc.NavbarSimple(
             children=[
+                dbc.NavItem(dbc.NavLink("Latest Data", href="/latest_data")),
                 dbc.NavItem(dbc.NavLink("Latest Values", href="/latest_values")),
                 dbc.NavItem(dbc.NavLink("Timeline", href="/timeline"))],
             brand="Lemmy-Stats",

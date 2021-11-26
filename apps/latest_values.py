@@ -21,8 +21,6 @@ font = dict(family="Helvetica",
             size=12)
 
 layout = html.Div(children=[
-    dropdown,
-    html.Br(),
     dcc.Dropdown(
         id='yaxis_column',
         options=[{'label': i, 'value': i} for i in metrics],
@@ -39,7 +37,7 @@ def update_combined_instances(yaxis_column):
     df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)} 
     FROM historical
     WHERE status == 'Success'
-    ORDER BY users_active_half_year""", cnx)
+    ORDER BY users_active_half_year DESC""", cnx)
     df = df.query("timestamp == timestamp.max()")
     fig = px.bar(df, x="url", y=yaxis_column, color="url", template=template)
     fig = fig.update_layout(font=font, showlegend=False, title=title)

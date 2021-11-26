@@ -25,8 +25,6 @@ font = dict(family="Helvetica",
             size=12)
 
 layout = html.Div(children=[
-    dropdown,
-    html.Br(),
     html.Div([
         dcc.Dropdown(
             id='xaxis-column',
