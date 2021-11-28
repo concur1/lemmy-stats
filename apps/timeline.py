@@ -10,11 +10,14 @@ from dash.dependencies import Input, Output
 from app import app, dropdown, template
 
 server = app.server
+time_unit_list = ['hour', 'day', 'month']
+strftime_dict = {'hour': '%Y-%m-%d %H:%M', 'day': '%Y-%m-%d', 'month': '%Y-%m'}
 
-selected_urls = sqlite3.connect('data/lemmy.db').execute("""SELECT distinct url from historical""")
+selected_urls = sqlite3.connect('data/lemmy.db').execute("""SELECT distinct url from historical
+                                                            where status = "Success"
+                                                            order by users DESC""")
 unique_urls = [instance[0] for instance in selected_urls]
-metrics = ["online", "new_comments", "new_posts", "new_communities", "users_active_day",
-           "users_active_month", "users_active_half_year"]
+metrics = ["average online", "comments", "posts", "users", "communities"]
 title = {'y': 0.9,
         'x': 0.5,
     'text': "Timeline",
@@ -27,40 +30,57 @@ font = dict(family="Helvetica",
 layout = html.Div(children=[
     html.Div([
         dcc.Dropdown(
-            id='xaxis-column',
+            id='time-unit',
+            options=[{'label': i, 'value': i} for i in time_unit_list],
+            value='hour')], style=css),
+    html.Div([
+        dcc.Dropdown(
+            id='instance-url',
             options=[{'label': i, 'value': i} for i in unique_urls],
             value='https://lemmy.ml')], style=css),
     html.Div([
         dcc.Dropdown(
             id='metric',
             options=[{'label': i, 'value': i} for i in metrics],
-            value='online')], style=css),
+            value='average online')], style=css),
     dcc.Graph(id='each-instance'),
 ])
 
 
 @app.callback(
     Output('each-instance', 'figure'),
-    Input('xaxis-column', 'value'),
+    Input('time-unit', 'value'),
+    Input('instance-url', 'value'),
     Input('metric', 'value'),
 )
-def update_each_instance(xaxis_column_name, metric):
+def update_each_instance(time_unit, instance_url, metric):
+    strftime_string = strftime_dict[time_unit]
+    if metric == "average online":
+        y_axis_name = "average online"
+    else:
+        y_axis_name = f"new {metric}/{time_unit}"
     cnx = sqlite3.connect('data/lemmy.db')
-    df = pd.read_sql(f"""SELECT timestamp, 
-                                url, 
-                                online, 
-                                users_active_day,
-                                users_active_month,
-                                users_active_half_year,
-                                comments-lag(comments) OVER win1 as new_comments,
-                                posts-lag(posts) OVER win1 as new_posts,
-                                communities-lag(communities) OVER win1 as new_communities
-                        FROM historical
-                        where url == '{xaxis_column_name}' and status == 'Success'
-                        WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp))
-                        order by timestamp""", cnx)
-    df = df[['timestamp', metric]].sort_values('timestamp', ascending=False)
-    fig = px.line(df, x="timestamp", y=metric, template=template)
+    df = pd.read_sql(f"""
+                    select STRFTIME('{strftime_string}', timestamp) as 'time',
+                    url,
+                    avg(online) as 'average online',
+                    sum(new_comments) as 'new comments/{time_unit}',
+                    sum(new_posts) as 'new posts/{time_unit}',
+                    sum(users) as 'new users/{time_unit}',
+                    sum(new_communities) as 'new communities/{time_unit}'
+                    from (SELECT timestamp, 
+                            url, 
+                            online, 
+                            comments-lag(comments) OVER win1 as new_comments,
+                            posts-lag(posts) OVER win1 as new_posts,
+                            users-lag(users) OVER win1 as users,
+                            communities-lag(communities) OVER win1 as new_communities
+                    FROM historical
+                    where url == '{instance_url}' and status == 'Success'
+                    WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp)))
+                    group by time
+                        """, cnx)
+    fig = px.line(df, x="time", y=y_axis_name, template=template)
     fig = fig.update_layout(font=font, title=title)
     return fig
 
