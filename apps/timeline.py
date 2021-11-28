@@ -11,7 +11,7 @@ from app import app, dropdown, template
 
 server = app.server
 time_unit_list = ['hour', 'day', 'month']
-strftime_dict = {'hour': '%Y-%m-%d %H:%M', 'day': '%Y-%m-%d', 'month': '%Y-%m'}
+strftime_dict = {'hour': '%Y-%m-%d %H:00', 'day': '%Y-%m-%d', 'month': '%Y-%m'}
 
 selected_urls = sqlite3.connect('data/lemmy.db').execute("""SELECT distinct url from historical
                                                             where status = "Success"
@@ -23,7 +23,7 @@ title = {'y': 0.9,
     'text': "Timeline",
     'xanchor': 'center',
     'yanchor': 'top'}
-css = {'width': '48%', 'display': 'inline-block'}
+css = {'width': '50%', 'display': 'inline-block'}
 font = dict(family="Helvetica",
             size=12)
 
@@ -35,14 +35,15 @@ layout = html.Div(children=[
             value='hour')], style=css),
     html.Div([
         dcc.Dropdown(
-            id='instance-url',
-            options=[{'label': i, 'value': i} for i in unique_urls],
-            value='https://lemmy.ml')], style=css),
-    html.Div([
-        dcc.Dropdown(
             id='metric',
             options=[{'label': i, 'value': i} for i in metrics],
             value='average online')], style=css),
+    html.Div([
+        dcc.Dropdown(
+            id='instance-url',
+            multi=True,
+            options=[{'label': i, 'value': i} for i in unique_urls],
+            value=[unique_urls[0]])]),
     dcc.Graph(id='each-instance'),
 ])
 
@@ -76,11 +77,11 @@ def update_each_instance(time_unit, instance_url, metric):
                             users-lag(users) OVER win1 as users,
                             communities-lag(communities) OVER win1 as new_communities
                     FROM historical
-                    where url == '{instance_url}' and status == 'Success'
+                    where url in ({', '.join([f'"{url}"' for url in instance_url])}) and status == 'Success'
                     WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp)))
-                    group by time
+                    group by time, url
                         """, cnx)
-    fig = px.line(df, x="time", y=y_axis_name, template=template)
+    fig = px.bar(df, x="time", y=y_axis_name, template=template, color='url')
     fig = fig.update_layout(font=font, title=title)
     return fig
 
