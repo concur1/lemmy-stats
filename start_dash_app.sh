@@ -1,3 +1,3 @@
 #!/bin/bash
 source venv/bin/activate
-gunicorn -w 3 app:server
+gunicorn -w 3 index:server
