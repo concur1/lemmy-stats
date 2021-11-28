@@ -7,6 +7,7 @@ server = app.server
 
 cnx = sqlite3.connect('data/lemmy.db')
 df = pd.read_sql(f"""SELECT "["||IIF(name != "None", name, url)||"]("||url||")" as instance, 
+"<a href='"||url||"'>test</a>" as instance2, 
                     comments,
                     users, 
                     posts, 
@@ -37,9 +38,15 @@ for row in df.to_dict('records'):
 
 layout = html.Div(children=[
     dash_table.DataTable(
+        # style_table={'overflowX': 'auto', 'fontSize': '11px'},
+        css=[{'selector': 'table', 'rule': 'table-layout: fixed'}],
+        style_table={'font-size': '11px'},
+        style_cell={
+            'width': '25%'
+        },
         id='data_table',
         columns=[{"name": i, "id": i, 'type': 'text', 'presentation': 'markdown'} for i in df.columns
-                 if i in ["instance",  "comments", "posts", "users", "communities"]],
+                 if i in ["instance",  "comments", "posts", "users"]],
         data=df.to_dict('records'),
         tooltip_data=tooltip_data,
         tooltip_delay=0,
