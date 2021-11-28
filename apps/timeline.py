@@ -82,7 +82,7 @@ def update_each_instance(time_unit, instance_url, metric):
                     group by time, url
                         """, cnx)
     fig = px.bar(df, x="time", y=y_axis_name, template=template, color='url')
-    fig = fig.update_layout(font=font, title=title)
+    fig = fig.update_layout(font=font, title=title, showlegend=False)
     return fig
 
 
