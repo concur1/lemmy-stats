@@ -5,7 +5,7 @@ from app import app, dropdown
 from apps import latest_values, timeline, latest_data
 
 server = app.server
-app.layout = html.Div(children=[
+layout = html.Div(children=[
     dropdown,
     html.Br(),
     dcc.Location(id='url', refresh=True),
