@@ -6,7 +6,14 @@ from app import app
 server = app.server
 
 cnx = sqlite3.connect('data/lemmy.db')
-df = pd.read_sql(f"""SELECT "["||IIF(name != "None", name, url)||"]("||url||")" as instance, *
+df = pd.read_sql(f"""SELECT "["||IIF(name != "None", name, url)||"]("||url||")" as instance, 
+                    comments,
+                    users, 
+                    posts, 
+                    communities,
+                    status,
+                    description,
+                    name
                     FROM historical
                     GROUP BY url
                     HAVING timestamp = max(timestamp)
@@ -31,7 +38,8 @@ for row in df.to_dict('records'):
 layout = html.Div(children=[
     dash_table.DataTable(
         id='data_table',
-        columns=[{"name": i, "id": i,'type':'text','presentation':'markdown'} for i in df.columns if i in ["instance", "version", "online", "users", "posts", "communities"]],
+        columns=[{"name": i, "id": i, 'type': 'text', 'presentation': 'markdown'} for i in df.columns
+                 if i in ["instance",  "comments", "posts", "users", "communities"]],
         data=df.to_dict('records'),
         tooltip_data=tooltip_data,
         tooltip_delay=0,
