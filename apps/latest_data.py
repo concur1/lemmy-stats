@@ -1,11 +1,7 @@
-from IPython.core.display import display, HTML
 import sqlite3
 import pandas as pd
-from dash import dcc, html, dash_table
-from dash.dependencies import Input, Output, State
-from collections import OrderedDict
-from app import app, dropdown
-from apps import latest_values, timeline
+from dash import html, dash_table
+from app import app
 
 server = app.server
 
@@ -22,7 +18,11 @@ for row in df.to_dict('records'):
     row_dict = {}
     for column, value in row.items():
         if row['status'] == "Success":
-            row_tooltip_markdown = f"\n {row['name']}: {row['description']}"
+            if row['description'] == "None":
+                description = "No Description"
+            else:
+                description = row['description']
+            row_tooltip_markdown = f"\n {row['name']}: {description}"
         else:
             row_tooltip_markdown = f"\n {row['status']}"
         row_dict[column] = {'value': row_tooltip_markdown, 'type': 'markdown'}

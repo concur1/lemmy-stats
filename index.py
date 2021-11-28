@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 from app import app, dropdown
 from apps import latest_values, timeline, latest_data
 
-server=app.server
+server = app.server
 app.layout = html.Div(children=[
     dropdown,
     html.Br(),
