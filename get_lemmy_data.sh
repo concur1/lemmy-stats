@@ -1,6 +1,6 @@
 #!/bin/bash
-source /home/project/lemmy-crawler-python/venv/bin/activate
-cd /home/project/lemmy-crawler-python/
+source lemmy-stats/venv/bin/activate
+cd lemmy-stats
 mkdir -p logs
 python fetch_and_save.py
 python insert_into_historical.py
