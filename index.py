@@ -5,7 +5,7 @@ from app import app, dropdown
 from apps import latest_values, timeline, latest_data
 
 server = app.server
-layout = html.Div(children=[
+app.layout = html.Div(children=[
     dropdown,
     html.Br(),
     dcc.Location(id='url', refresh=True),
@@ -37,5 +37,6 @@ def display_page(pathname):
         return '404'
 
 
+layout = app.layout
 if __name__ == '__main__':
     app.run_server(debug=True)
