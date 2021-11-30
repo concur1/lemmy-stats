@@ -8,21 +8,26 @@ from app import app, dropdown
 from apps import instance_comparison, timeline, latest_data
 
 
-cnx = sqlite3.connect('data/lemmy.db')
-df = pd.read_sql(f"""SELECT max(timestamp)
-                     FROM historical""", cnx)
-get_updated_timestamp = df.to_dict('list')['max(timestamp)'][0][:-4]
+@app.callback(Output('refresh-div', 'children'), [Input('interval', 'n_intervals')])
+def trigger_by_modify(n):
+    cnx = sqlite3.connect('data/lemmy.db')
+    df = pd.read_sql(f"""SELECT max(timestamp)
+                         FROM historical""", cnx)
+    timestamp = df.to_dict('list')['max(timestamp)'][0][:-4]
+    return html.H5(f"Latest Data: {timestamp}", style={"max-width": "90%", "margin": "auto"})
+
 
 server = app.server
 app.layout = html.Div(children=[
     dropdown,
     html.Br(),
+    html.Div(id='refresh-div'),
     dcc.Location(id='url', refresh=True),
     html.Div(children=[
-        dcc.Markdown(f"Last refresh: {get_updated_timestamp}"),
         html.Div(id='page-content')
     ], style={"max-width": "90%",
-              "margin": "auto"})
+              "margin": "auto"}),
+    dcc.Interval(id='interval', interval=60000, n_intervals=0)
 ])
 
 homepage = html.Div([

@@ -38,7 +38,7 @@ def update_combined_instances(yaxis_column):
     WHERE status == 'Success'
     ORDER BY {yaxis_column} DESC""", cnx)
     df = df.query("timestamp == timestamp.max()")
-    fig = px.bar(df, x="url", y=yaxis_column, color="url", template=template)
+    fig = px.bar(df, y="url", x=yaxis_column, color="url", orientation='h', height=len(df)*50, template=template)
     fig = fig.update_layout(font=font, showlegend=False)
     return fig
 
