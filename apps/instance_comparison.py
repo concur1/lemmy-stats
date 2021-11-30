@@ -39,7 +39,7 @@ def update_combined_instances(yaxis_column):
     ORDER BY {yaxis_column} DESC""", cnx)
     df = df.query("timestamp == timestamp.max()")
     fig = px.bar(df, y="name", x=yaxis_column, color="name", orientation='h', height=len(df)*50, template=template)
-    fig = fig.update_layout(font=font, showlegend=False)
+    fig = fig.update_layout(yaxis_visible=False, font=font, showlegend=False)
     return fig
 
 
