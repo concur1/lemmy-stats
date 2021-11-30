@@ -33,12 +33,12 @@ layout = html.Div(children=[
 )
 def update_combined_instances(yaxis_column):
     cnx = sqlite3.connect('data/lemmy.db')
-    df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)} 
+    df = pd.read_sql(f"""SELECT timestamp, name, {', '.join(metrics)} 
     FROM historical
     WHERE status == 'Success'
     ORDER BY {yaxis_column} DESC""", cnx)
     df = df.query("timestamp == timestamp.max()")
-    fig = px.bar(df, y="url", x=yaxis_column, color="url", orientation='h', height=len(df)*50, template=template)
+    fig = px.bar(df, y="name", x=yaxis_column, color="name", orientation='h', height=len(df)*50, template=template)
     fig = fig.update_layout(font=font, showlegend=False)
     return fig
 
