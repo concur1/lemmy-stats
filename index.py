@@ -14,7 +14,9 @@ def trigger_by_modify(n):
     df = pd.read_sql(f"""SELECT max(timestamp)
                          FROM historical""", cnx)
     timestamp = df.to_dict('list')['max(timestamp)'][0][:-4]
-    return html.H5(f"Latest Data: {timestamp}", style={"max-width": "90%", "margin": "auto"})
+    return html.Div([html.H6(f"Latest Data: {timestamp}")], style={"margin": "auto",
+                                                                   "max-width": "90%",
+                                                                   "text-align": "centre"})
 
 
 server = app.server
@@ -23,10 +25,9 @@ app.layout = html.Div(children=[
     html.Br(),
     html.Div(id='refresh-div'),
     dcc.Location(id='url', refresh=True),
-    html.Div(children=[
-        html.Div(id='page-content')
-    ], style={"max-width": "90%",
-              "margin": "auto"}),
+        html.Div(id='page-content',
+                 style={"max-width": "90%",
+                        "margin": "auto"}),
     dcc.Interval(id='interval', interval=60000, n_intervals=0)
 ])
 
