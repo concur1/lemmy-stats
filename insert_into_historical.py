@@ -113,16 +113,6 @@ def find_metadata_instances():
     return list(metadata_instances)
 
 
-def save_instance_categories():
-    all_instances = find_all_instances(processed_json_data)
-    metadata_instances = find_metadata_instances()
-    instance_dict = {"all_instances": all_instances,
-    "metadata_instances": metadata_instances,
-    "unknown_instances": find_unknown_instances(metadata_instances, all_instances)}
-    with open(f'data/instance_categories/{str(timestamp)}.json', 'w') as f:
-        json.dump(instance_dict, f)
-
-
 def find_unknown_instances(metadata_instances, all_instances):
     return [f"https://{instance}" for instance in all_instances if f"https://{instance}" not in metadata_instances]
 
@@ -156,6 +146,5 @@ raw_json_dir = "data/raw_json"
 all_json_data = load_from_json_dir(raw_json_dir)
 processed_json_data = process_json_data(all_json_data)
 create_or_append_sqllite_tables(processed_json_data)
-save_instance_categories()
 zip_json_files(raw_json_dir)
 print(f"convert and load to historical table: {datetime.datetime.now() - timestamp}")
