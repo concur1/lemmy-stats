@@ -1,17 +1,28 @@
+import sqlite3
+import pandas as pd
+
 from dash import dcc, html
 from dash.dependencies import Input, Output
 
 from app import app, dropdown
 from apps import instance_comparison, timeline, latest_data
 
+
+cnx = sqlite3.connect('data/lemmy.db')
+df = pd.read_sql(f"""SELECT max(timestamp)
+                     FROM historical""", cnx)
+get_updated_timestamp = df.to_dict('list')['max(timestamp)'][0][:-4]
+
 server = app.server
 app.layout = html.Div(children=[
     dropdown,
     html.Br(),
     dcc.Location(id='url', refresh=True),
-    html.Div(id='page-content',
-             style={"max-width": "90%",
-                    "margin": "auto"}),
+    html.Div(children=[
+        dcc.Markdown(f"Last refresh: {get_updated_timestamp}"),
+        html.Div(id='page-content')
+    ], style={"max-width": "90%",
+              "margin": "auto"})
 ])
 
 homepage = html.Div([
@@ -35,6 +46,9 @@ def display_page(pathname):
         return homepage
     else:
         return '404'
+
+
+
 
 
 layout = app.layout

@@ -8,8 +8,7 @@ import pandas as pd
 
 server = app.server
 
-metrics = ["online", "users_active_day", "users_active_week", "users_active_month",
-           "users_active_half_year"]
+metrics = ["online", "comments", "posts", "users", "communities"]
 title = {'y': 0.9,
         'x': 0.5,
         'text': "Latest Values",
@@ -24,7 +23,7 @@ layout = html.Div(children=[
     dcc.Dropdown(
         id='yaxis_column',
         options=[{'label': i, 'value': i} for i in metrics],
-        value='users_active_half_year'),
+        value='users'),
     dcc.Graph(id='combined-instances')])
 
 
@@ -37,10 +36,10 @@ def update_combined_instances(yaxis_column):
     df = pd.read_sql(f"""SELECT timestamp, url, {', '.join(metrics)} 
     FROM historical
     WHERE status == 'Success'
-    ORDER BY users_active_half_year DESC""", cnx)
+    ORDER BY {yaxis_column} DESC""", cnx)
     df = df.query("timestamp == timestamp.max()")
     fig = px.bar(df, x="url", y=yaxis_column, color="url", template=template)
-    fig = fig.update_layout(font=font, showlegend=False, title=title)
+    fig = fig.update_layout(font=font, showlegend=False)
     return fig
 
 
