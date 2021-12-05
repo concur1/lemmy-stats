@@ -1,4 +1,5 @@
 #!/bin/bash
+cd /home/project/lemmy-stats
 pkill gunicorn
 source venv/bin/activate
 gunicorn -w 3 index:server &
