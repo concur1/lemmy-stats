@@ -30,13 +30,9 @@ app.layout = html.Div(children=[
                         "margin": "auto"}),
     dcc.Interval(id='interval', interval=60000, n_intervals=0)
 ])
-
-homepage = html.Div([
-                    dcc.Markdown('''
-                    - [Click here to see how lemmy activity has changed over time](/timeline)
-                    
-                    - [Click here to see the latest activity for each instance](/instance_comparison)
-                    ''')])
+with open("readme.md", "r") as readme:
+    readme_str = readme.read()
+homepage = html.Div([dcc.Markdown(readme_str)])
 
 
 @app.callback(Output('page-content', 'children'),
@@ -52,9 +48,6 @@ def display_page(pathname):
         return homepage
     else:
         return '404'
-
-
-
 
 
 layout = app.layout
