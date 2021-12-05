@@ -1,6 +1,6 @@
 #!/bin/bash
-
 pkill gunicorn
 source venv/bin/activate
 gunicorn -w 3 index:server &
-watch -n 1200 ./get_lemmy_data.sh >> logs/get_lemmy_data.log
+mkdir -p logs
+python get_lemmy_data.py 1200 >logs/get_lemmy_data.log 2>&1 < logs/get_lemmy_data.log &

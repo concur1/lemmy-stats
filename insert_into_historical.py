@@ -19,13 +19,13 @@ def process_json_data(all_json_data):
     processed_json_data = []
     for file in all_json_data:
         for instance in file:
-            if instance["status"] == "Success":
+            if instance["status"] == "Success" and instance["json"]["site_view"] is not None:
                 row = {"timestamp": instance["timestamp"],
                      "url": instance["url"],
                      "status": instance["status"],
-                     "name": instance["json"]["site_view"]["site"]["name"],
                      "online": instance["json"]["online"],
                      "version": instance["json"]["version"],
+                     "name": instance["json"]["site_view"]["site"]["name"],
                      "description": instance["json"]["site_view"]["site"]["description"],
                      "users": instance["json"]["site_view"]["counts"]["users"],
                      "posts": instance["json"]["site_view"]["counts"]["posts"],
@@ -37,8 +37,7 @@ def process_json_data(all_json_data):
                      "users_active_half_year": instance["json"]["site_view"]["counts"]["users_active_half_year"],
                      "updated": instance["json"]["site_view"]["site"]["updated"],
                      "linked_federated_instances": instance["json"]["federated_instances"]["linked"],
-                     "allowed_federated_instances": instance["json"]["federated_instances"]["allowed"]
-                       }
+                     "allowed_federated_instances": instance["json"]["federated_instances"]["allowed"]}
                 processed_json_data.append(row)
             else:
                 row = {"timestamp": instance["timestamp"],
@@ -140,11 +139,13 @@ def create_or_append_sqllite_tables(processed_json_data):
         con.commit()
     con.close()
 
-timestamp = datetime.datetime.now()
-raw_json_dir = "data/raw_json"
 
-all_json_data = load_from_json_dir(raw_json_dir)
-processed_json_data = process_json_data(all_json_data)
-create_or_append_sqllite_tables(processed_json_data)
-zip_json_files(raw_json_dir)
-print(f"convert and load to historical table: {datetime.datetime.now() - timestamp}")
+def insert_into_historical():
+    timestamp = datetime.datetime.now()
+    raw_json_dir = "data/raw_json"
+
+    all_json_data = load_from_json_dir(raw_json_dir)
+    processed_json_data = process_json_data(all_json_data)
+    create_or_append_sqllite_tables(processed_json_data)
+    zip_json_files(raw_json_dir)
+    print(f"convert and load to historical table runtime: {datetime.datetime.now() - timestamp}")
