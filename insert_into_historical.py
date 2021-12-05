@@ -119,14 +119,30 @@ def find_unknown_instances(metadata_instances, all_instances):
 def create_or_append_sqllite_tables(processed_json_data):
     con = sqlite3.connect('data/lemmy.db')
     cur = con.cursor()
-    schema = "timestamp text, url text, status text, name text, online integer, version text, description text, " \
-             "users integer, posts integer, comments integer, communities integer, users_active_day integer, users_active_week " \
-             "integer, users_active_month integer, users_active_half_year integer, updated text, " \
-             "linked_federated_instances text, allowed_federated_instances text"
+    schema_dict = {'timestamp': 'text',
+                    'url': 'text',
+                    'status': 'text',
+                    'name': 'text',
+                    'online': 'integer',
+                    'version': 'text',
+                    'description': 'text',
+                    'users': 'integer',
+                    'posts': 'integer',
+                    'comments': 'integer',
+                    'communities': 'integer',
+                    'users_active_day': 'integer',
+                    'users_active_week': 'integer',
+                    'users_active_month': 'integer',
+                    'users_active_half_year': 'integer',
+                    'updated': 'text',
+                    'linked_federated_instances': 'text',
+                    'allowed_federated_instances': 'text'}
+    schema = ", ".join([f"{key} {value}" for key, value in schema_dict.items()])
     cur.execute(f'''CREATE TABLE IF NOT EXISTS historical ({schema})''')
     for row in processed_json_data:
         values_to_insert = []
-        for item in row.values():
+        for column_name in schema_dict.keys():
+            item = row[column_name]
             if not isinstance(item, int):
                 item = str(item).replace("""'""", """''""")
                 values_to_insert.append(f"'{item}'")
@@ -135,6 +151,7 @@ def create_or_append_sqllite_tables(processed_json_data):
 
         values_to_insert_string = ", ".join(values_to_insert)
         insert_string = f"INSERT INTO historical VALUES ({values_to_insert_string})"
+        print(row, "\n\n", insert_string)
         cur.execute(insert_string)
         con.commit()
     con.close()
@@ -149,3 +166,4 @@ def insert_into_historical():
     create_or_append_sqllite_tables(processed_json_data)
     zip_json_files(raw_json_dir)
     print(f"convert and load to historical table runtime: {datetime.datetime.now() - timestamp}")
+
