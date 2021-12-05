@@ -151,7 +151,6 @@ def create_or_append_sqllite_tables(processed_json_data):
 
         values_to_insert_string = ", ".join(values_to_insert)
         insert_string = f"INSERT INTO historical VALUES ({values_to_insert_string})"
-        print(row, "\n\n", insert_string)
         cur.execute(insert_string)
         con.commit()
     con.close()
