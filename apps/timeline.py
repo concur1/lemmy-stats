@@ -16,7 +16,7 @@ strftime_dict = {'hour': '%Y-%m-%d %H:00', 'day': '%Y-%m-%d', 'month': '%Y-%m'}
 selected_urls = sqlite3.connect('data/lemmy.db').execute("""SELECT distinct url from historical
                                                             where status = "Success"
                                                             order by users DESC""")
-unique_urls = [instance[0] for instance in selected_urls]
+unique_urls = ['all instances'] + [instance[0] for instance in selected_urls]
 metrics = ["average online", "comments", "posts", "users", "communities"]
 title = {'y': 0.9,
         'x': 0.5,
@@ -77,10 +77,12 @@ def update_each_instance(time_unit, instance_url, metric):
                             users-lag(users) OVER win1 as users,
                             communities-lag(communities) OVER win1 as new_communities
                     FROM historical
-                    where url in ({', '.join([f'"{url}"' for url in instance_url])}) and status == 'Success'
+                    where status == 'Success' and not (comments == 0 and posts = 0 and users = 0 and communities = 0)
                     WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp)))
                     group by time, url
                         """, cnx)
+    all_instances = df.copy(deep=True).query('url != "https://sopuli.xyz"').assign(name='all instances', url='all instances').groupby(['time', 'url'], as_index=False).sum()
+    df = df.append(all_instances, ignore_index=True).query(f"""url in ({', '.join([f'"{url}"' for url in instance_url])})""")
     fig = px.line(df, x="time", y=y_axis_name, template=template, color='url')
     fig = fig.update_layout(font=font, title=title, showlegend=False)
     return fig
