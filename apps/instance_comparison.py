@@ -41,7 +41,7 @@ def update_combined_instances(yaxis_column):
     fig = px.bar(df, y="name", x=yaxis_column, color="name", text="name", orientation='h', height=len(df)*50,
                  template=template)
     fig.update_traces(texttemplate='%{text}')
-    fig = fig.update_layout(yaxis_visible=False, font=font, showlegend=False, margin=dict(l=0, r=0))
+    fig = fig.update_layout(yaxis_visible=False, font=font, showlegend=False, margin=dict(l=0, r=0), xaxis={'side': 'top'})
     return fig
 
 
