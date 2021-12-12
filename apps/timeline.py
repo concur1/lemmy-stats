@@ -93,7 +93,7 @@ def update_each_instance(time_unit, instance_url, metric):
         .sum()
     df = df.append(all_instances, ignore_index=True).query(f"""url in ({', '.join([f'"{url}"' for url in instance_url])})""")
     fig = px.line(df, x="time", y=y_axis_name, template=template, color='url')
-    fig = fig.update_layout(font=font, title=title, showlegend=False)
+    fig = fig.update_layout(font=font, title=title, showlegend=False, margin=dict(l=0, r=0))
     return fig
 
 
