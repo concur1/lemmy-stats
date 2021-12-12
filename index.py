@@ -1,9 +1,7 @@
 import sqlite3
 import pandas as pd
-
 from dash import dcc, html
 from dash.dependencies import Input, Output
-
 from app import app, dropdown
 from apps import instance_comparison, timeline, latest_data
 

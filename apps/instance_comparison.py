@@ -2,7 +2,7 @@ from dash import dcc
 from dash import html
 import plotly.express as px
 from dash.dependencies import Input, Output
-from app import app, dropdown, template
+from app import app, template
 import sqlite3
 import pandas as pd
 
@@ -10,10 +10,10 @@ server = app.server
 
 metrics = ["online", "comments", "posts", "users", "communities"]
 title = {'y': 0.9,
-        'x': 0.5,
-        'text': "Latest Values",
-        'xanchor': 'center',
-        'yanchor': 'top'}
+         'x': 0.5,
+         'text': "Latest Values",
+         'xanchor': 'center',
+         'yanchor': 'top'}
 
 css = {'width': '48%', 'display': 'inline-block'}
 font = dict(family="Helvetica",

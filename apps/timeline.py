@@ -1,13 +1,10 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
-import os
 from dash import dcc
 from dash import html
 import plotly.express as px
 import pandas as pd
 import sqlite3
 from dash.dependencies import Input, Output
-from app import app, dropdown, template
+from app import app, template
 
 server = app.server
 time_unit_list = ['hour', 'day', 'month']
@@ -19,10 +16,10 @@ selected_urls = sqlite3.connect('data/lemmy.db').execute("""SELECT distinct url 
 unique_urls = ['all instances'] + [instance[0] for instance in selected_urls]
 metrics = ["average online", "comments", "posts", "users", "communities"]
 title = {'y': 0.9,
-        'x': 0.5,
-    'text': "Timeline",
-    'xanchor': 'center',
-    'yanchor': 'top'}
+         'x': 0.5,
+         'text': "Timeline",
+         'xanchor': 'center',
+         'yanchor': 'top'}
 css = {'width': '50%', 'display': 'inline-block'}
 font = dict(family="Helvetica",
             size=12)
