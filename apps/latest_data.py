@@ -42,8 +42,14 @@ layout = html.Div(children=[
         css=[{'selector': 'table', 'rule': 'table-layout: fixed'}],
         style_table={'font-size': '11px'},
         style_cell={
-            'width': '25%'
+            'width': '25%',
+            'textAlign': 'left'
         },
+        style_header={
+            'fontWeight': 'bold',
+            'font-size': '12px',
+        },
+        style_as_list_view=True,
         id='data_table',
         columns=[{"name": i, "id": i, 'type': 'text', 'presentation': 'markdown'} for i in df.columns
                  if i in ["instance",  "comments", "posts", "users"]],
