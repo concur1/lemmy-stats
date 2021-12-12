@@ -62,26 +62,35 @@ def update_each_instance(time_unit, instance_url, metric):
         y_axis_name = f"new {metric}/{time_unit}"
     cnx = sqlite3.connect('data/lemmy.db')
     df = pd.read_sql(f"""
-                    select STRFTIME('{strftime_string}', timestamp) as 'time',
-                    url,
-                    avg(online) as 'average online',
-                    sum(new_comments) as 'new comments/{time_unit}',
-                    sum(new_posts) as 'new posts/{time_unit}',
-                    sum(users) as 'new users/{time_unit}',
-                    sum(new_communities) as 'new communities/{time_unit}'
-                    from (SELECT timestamp, 
-                            url, 
-                            online, 
-                            comments-lag(comments) OVER win1 as new_comments,
-                            posts-lag(posts) OVER win1 as new_posts,
-                            users-lag(users) OVER win1 as users,
-                            communities-lag(communities) OVER win1 as new_communities
-                    FROM historical
-                    where status == 'Success' and not (comments == 0 and posts = 0 and users = 0 and communities = 0)
-                    WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp)))
-                    group by time, url
+                        select time,
+                               url,
+                               name,
+                               avg(online) as 'average online',
+                               sum(new_comments) as 'new comments/{time_unit}',
+                               sum(new_posts) as 'new posts/{time_unit}',
+                               sum(users) as 'new users/{time_unit}',
+                               sum(new_communities) as 'new communities/{time_unit}'
+                        from (SELECT timestamp, 
+                                     STRFTIME('{strftime_string}', timestamp) as 'time',
+                                     url, 
+                                     name,
+                                     online, 
+                                     comments-lag(comments) OVER win1 as new_comments,
+                                     posts-lag(posts) OVER win1 as new_posts,
+                                     users-lag(users) OVER win1 as users,
+                                     communities-lag(communities) OVER win1 as new_communities
+                               FROM historical
+                        where status == 'Success' and not (comments == 0 and posts = 0 and users = 0 and communities = 0)
+                        WINDOW win1 AS (PARTITION BY url ORDER BY datetime(timestamp)))
+                        group by time, url
+                        having time>(select min(STRFTIME('{strftime_string}', timestamp)) from historical)
+                               and time < (select max(STRFTIME('{strftime_string}', timestamp)) from historical)
                         """, cnx)
-    all_instances = df.copy(deep=True).query('url != "https://sopuli.xyz"').assign(name='all instances', url='all instances').groupby(['time', 'url'], as_index=False).sum()
+
+    all_instances = df.copy(deep=True).query('url != "https://sopuli.xyz"')\
+        .assign(name='all instances', url='all instances')\
+        .groupby(['time', 'url'], as_index=False)\
+        .sum()
     df = df.append(all_instances, ignore_index=True).query(f"""url in ({', '.join([f'"{url}"' for url in instance_url])})""")
     fig = px.line(df, x="time", y=y_axis_name, template=template, color='url')
     fig = fig.update_layout(font=font, title=title, showlegend=False)
